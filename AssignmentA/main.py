@@ -73,7 +73,7 @@ def run_test(size, filename):
     print("-" * 20)
 
 
-run_test(3, 'C:/School/AI/AssignmentA/test_data/ex1.txt')
+run_test(3, 'AI\\AssignmentA\\test_data\\ex1.txt')
 run_test(3, 'C:/School/AI/AssignmentA/test_data/ex2.txt')
 run_test(3, 'C:/School/AI/AssignmentA/test_data/ex3.txt')
 run_test(3, 'C:/School/AI/AssignmentA/test_data/ex4.txt')

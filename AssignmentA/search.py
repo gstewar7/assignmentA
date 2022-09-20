@@ -1,4 +1,6 @@
+from asyncio import start_server
 from helpers import Node, NPuzzle, LEFT, RIGHT, UP, DOWN
+from itertools import chain
 from copy import deepcopy
 
 def check_last_move(target, prevMoves):
@@ -6,6 +8,32 @@ def check_last_move(target, prevMoves):
         if target == prevMoves[-1]:
             return True
     return False
+
+def check_neighbors(node):
+    puzzle = node.state
+    zeroX, zeroY = puzzle.zero[0], puzzle.zero[1]
+    newNodes = []
+    
+    if zeroX != puzzle.size-1:
+        newPuzzle = deepcopy(puzzle)
+        newPuzzle.swap(zeroX, zeroY, zeroX + 1, zeroY)
+        newNodes.append(Node(newPuzzle, node, UP))
+
+    if zeroY != 0:
+        newPuzzle = deepcopy(puzzle)
+        newPuzzle.swap(zeroX, zeroY, zeroX, zeroY-1)
+        newNodes.append(Node(newPuzzle, node, RIGHT))
+    if zeroX != 0:
+        newPuzzle = deepcopy(puzzle)
+        newPuzzle.swap(zeroX, zeroY, zeroX - 1, zeroY)
+        newNodes.append(Node(newPuzzle, node, DOWN))
+    if zeroY != puzzle.size-1:
+        newPuzzle = deepcopy(puzzle)
+        newPuzzle.swap(zeroX, zeroY, zeroX, zeroY+1)
+        newNodes.append(Node(newPuzzle, node, LEFT))
+    
+    return newNodes
+
 
 def BFS(puzzle):
     """
@@ -22,60 +50,47 @@ def BFS(puzzle):
 
     states_searched = [Node(puzzle)]
     final_solution = []
+    
+    
     # TODO: WRITE CODE
-    queue = [Node(puzzle)]
-    parentNode = Node(puzzle)
-
-    while len(queue) != 0:
-        popped = queue.pop(0)        
+    if puzzle.size > 3:
+        print("Puzzle too big, did not try")
+        return states_searched, final_solution
+    frontier = [Node(puzzle)]
+    current = frontier [0]
+    while len(frontier):
         
-        states_searched.append(popped)
-        #print(popped.print_puzzle())        
-        zeroX = popped.state.zero[0]
-        zeroY = popped.state.zero[1]
 
-        if popped.state.check_puzzle():
-            print(popped.print_puzzle())
-            popped.moves = [popped.moves[len(popped.moves) - i]
-                for i in range(1, len(popped.moves)+1)]
-                
-            final_solution = popped.moves
+        current = frontier.pop(0)
+        states_searched.append(current)
+
+
+        if current.state.check_puzzle():          
+            final_solution = current.moves
+            print(current.state.print_puzzle())
+            print("Depth level", current.depth)
             return states_searched, final_solution
         else:
-                
-            if zeroY != 0 and not check_last_move(UP, popped.moves) :
-                newPuzzle = deepcopy(popped.state)
-                newPuzzle.swap(zeroX, zeroY, zeroX, zeroY-1)
-                newNode = Node(newPuzzle, popped, DOWN)
-                queue.append(newNode)
+            newNodes = check_neighbors(current)
+            for i in newNodes:
 
-            if zeroX != puzzle.size-1 and not check_last_move(RIGHT, popped.moves)  :
-                newPuzzle = deepcopy(popped.state)
-                newPuzzle.swap(zeroX, zeroY, zeroX+1, zeroY)
-                newNode = Node(newPuzzle, popped, LEFT)
-                queue.append(newNode)
+                """ for j in states_searched:
+                    if i.state.puzzle == j.state.puzzle and len(newNodes) > 0:
+                        newNodes.pop(0)
+                for j in frontier:
+                    if i.state.puzzle == j.state.puzzle and len(newNodes) > 0:
+                        newNodes.pop(0) """
+                if i.parent.moves == []:
+                    frontier.append(i)
+                    continue
+                elif i.moves != []:
+                    if abs(i.parent.moves[-1] - i.moves[-1]) != 2: 
+                        frontier.append(i)
 
-            if zeroY != puzzle.size-1 and not check_last_move(DOWN, popped.moves) :
-                newPuzzle = deepcopy(popped.state)
-                newPuzzle.swap(zeroX, zeroY, zeroX, zeroY+1)
-                newNode = Node(newPuzzle, popped, UP)
-                queue.append(newNode)
+    #end of while loop
 
-            if zeroX != 0 and not check_last_move(LEFT, popped.moves) :
-                newPuzzle = deepcopy(popped.state)
-                newPuzzle.swap(zeroX, zeroY, zeroX-1, zeroY)
-                newNode = Node(newPuzzle, popped, RIGHT)
-                queue.append(newNode)
-
-
-
-
-
-
-
-    
+    print("Depth limit reached")
     return states_searched, final_solution
-
 
 def DFS(puzzle):
     """
@@ -93,66 +108,9 @@ def DFS(puzzle):
     final_solution = []
 
     # TODO: WRITE CODE
-    states_searched = [Node(puzzle)]
-    final_solution = []
-    # TODO: WRITE CODE
-    queue = [Node(puzzle)]
-    parentNode = Node(puzzle)
-    popped = Node(puzzle)
 
-    while len(queue) != 0 and popped.depth < 25:
-        popped = queue.pop(0)        
-        
-        states_searched.append(popped)
-        #print(popped.print_puzzle())        
-        zeroX = popped.state.zero[0]
-        zeroY = popped.state.zero[1]
 
-        if popped.state.check_puzzle():
-            print(popped.print_puzzle())
-            popped.moves = [popped.moves[len(popped.moves) - i]
-                for i in range(1, len(popped.moves)+1)]
-                
-            final_solution = popped.moves
-            return states_searched, final_solution
-        else:
-                
-            if zeroY != 0 and not check_last_move(UP, popped.moves) :
-                newPuzzle = deepcopy(popped.state)
-                newPuzzle.swap(zeroX, zeroY, zeroX, zeroY-1)
-                newNode = Node(newPuzzle, popped, DOWN)
-                queue.append(newNode)
-                states_searched.append(newNode)
-                continue
 
-            if zeroX != puzzle.size-1 and not check_last_move(RIGHT, popped.moves)  :
-                newPuzzle = deepcopy(popped.state)
-                newPuzzle.swap(zeroX, zeroY, zeroX+1, zeroY)
-                newNode = Node(newPuzzle, popped, LEFT)
-                queue.append(newNode)                
-                states_searched.append(newNode)
-                continue
-
-            if zeroY != puzzle.size-1 and not check_last_move(DOWN, popped.moves) :
-                newPuzzle = deepcopy(popped.state)
-                newPuzzle.swap(zeroX, zeroY, zeroX, zeroY+1)
-                newNode = Node(newPuzzle, popped, UP)
-                queue.append(newNode)
-                states_searched.append(newNode)
-                continue
-
-            if zeroX != 0 and not check_last_move(LEFT, popped.moves) :
-                newPuzzle = deepcopy(popped.state)
-                newPuzzle.swap(zeroX, zeroY, zeroX-1, zeroY)
-                newNode = Node(newPuzzle, popped, RIGHT)
-                queue.append(newNode)
-                states_searched.append(newNode)
-                continue
-
-    popped.moves = [popped.moves[len(popped.moves) - i]
-                for i in range(1, len(popped.moves)+1)]
-                
-    final_solution = popped.moves
     return states_searched, final_solution
 
 
