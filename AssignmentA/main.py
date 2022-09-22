@@ -42,7 +42,7 @@ def run_test(size, filename):
         print("          SOL MOVES: " + get_move_string(moves))
     else:
         print("    BFS | PASS")
-        print("          SOL MOVES: " + get_move_string(moves))
+        print("          SOL MOVES: " + get_move_string (moves))
 
     puzzle.read_puzzle(filename)
     states, moves = DFS(puzzle)
@@ -73,9 +73,9 @@ def run_test(size, filename):
     print("-" * 20)
 
 
-run_test(3, 'AI\\AssignmentA\\test_data\\ex1.txt')
-run_test(3, 'AI\\AssignmentA\\test_data\\ex2.txt')
-run_test(3, 'AI\\AssignmentA\\test_data\\ex3.txt')
-run_test(3, 'AI\\AssignmentA\\test_data\\ex4.txt')
-run_test(4, 'AI\\AssignmentA\\test_data\\ex5.txt')
-run_test(4, 'AI\\AssignmentA\\test_data\\ex6.txt') 
+run_test(3, 'C:/School/AI/AssignmentA/test_data/ex1.txt')
+run_test(3, 'C:/School/AI/AssignmentA/test_data/ex2.txt')
+run_test(3, 'C:/School/AI/AssignmentA/test_data/ex3.txt')
+run_test(3, 'C:/School/AI/AssignmentA/test_data/ex4.txt')
+run_test(4, 'C:/School/AI/AssignmentA/test_data/ex5.txt')
+run_test(4, 'C:/School/AI/AssignmentA/test_data/ex6.txt') 

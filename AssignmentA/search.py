@@ -1,13 +1,6 @@
-from asyncio import start_server
 from helpers import Node, NPuzzle, LEFT, RIGHT, UP, DOWN
-from itertools import chain
 from copy import deepcopy
 
-def check_last_move(target, prevMoves):
-    if len(prevMoves) > 0:
-        if target == prevMoves[-1]:
-            return True
-    return False
 
 def check_neighbors(node):
     puzzle = node.state
@@ -18,11 +11,6 @@ def check_neighbors(node):
         newPuzzle = deepcopy(puzzle)
         newPuzzle.swap(zeroX, zeroY, zeroX + 1, zeroY)
         newNodes.append(Node(newPuzzle, node, UP))
-
-    if zeroY != 0:
-        newPuzzle = deepcopy(puzzle)
-        newPuzzle.swap(zeroX, zeroY, zeroX, zeroY-1)
-        newNodes.append(Node(newPuzzle, node, RIGHT))
     if zeroX != 0:
         newPuzzle = deepcopy(puzzle)
         newPuzzle.swap(zeroX, zeroY, zeroX - 1, zeroY)
@@ -31,6 +19,10 @@ def check_neighbors(node):
         newPuzzle = deepcopy(puzzle)
         newPuzzle.swap(zeroX, zeroY, zeroX, zeroY+1)
         newNodes.append(Node(newPuzzle, node, LEFT))
+    if zeroY != 0:
+        newPuzzle = deepcopy(puzzle)
+        newPuzzle.swap(zeroX, zeroY, zeroX, zeroY-1)
+        newNodes.append(Node(newPuzzle, node, RIGHT))
     
     return newNodes
 
@@ -56,36 +48,40 @@ def BFS(puzzle):
     if puzzle.size > 3:
         print("Puzzle too big, did not try")
         return states_searched, final_solution
+        
     frontier = [Node(puzzle)]
-    current = frontier [0]
+    #current = frontier [0]
+
+    states_puzzles = [states_searched[0].state.puzzle]
+    frontier_puzzles = [frontier[0].state.puzzle]
+
+    if states_searched[0].moves == []:
+        states_searched.pop()
+
     while len(frontier):
         
 
         current = frontier.pop(0)
+        frontier_puzzles.pop(0)
         states_searched.append(current)
-
+        states_puzzles.append(current.state.puzzle)
 
         if current.state.check_puzzle():          
             final_solution = current.moves
-            print(current.state.print_puzzle())
-            print("Depth level", current.depth)
+            # #print(current.state.print_puzzle())
+            # print("Depth level", current.depth)
             return states_searched, final_solution
         else:
             newNodes = check_neighbors(current)
-            for i in newNodes:
 
-                """ for j in states_searched:
-                    if i.state.puzzle == j.state.puzzle and len(newNodes) > 0:
-                        newNodes.pop(0)
-                for j in frontier:
-                    if i.state.puzzle == j.state.puzzle and len(newNodes) > 0:
-                        newNodes.pop(0) """
+            for i in newNodes:
                 if i.parent.moves == []:
                     frontier.append(i)
+                    frontier_puzzles.append(i.state.puzzle)
                     continue
-                elif i.moves != []:
-                    if abs(i.parent.moves[-1] - i.moves[-1]) != 2: 
+                elif i.state.puzzle not in states_puzzles and i.state.puzzle not in frontier_puzzles:
                         frontier.append(i)
+                        frontier_puzzles.append(i.state.puzzle)
 
     #end of while loop
 
@@ -104,11 +100,41 @@ def DFS(puzzle):
     final_solution: An ordered list of moves representing the final solution.
     """
 
-    states_searched = [Node(puzzle)]
+    states_searched = []
     final_solution = []
 
     # TODO: WRITE CODE
+    if puzzle.size > 3:
+        print("Puzzle too big, did not try")
+        states_searched = [Node(puzzle)]
+        return states_searched, final_solution
 
+    frontier = [Node(puzzle)]
+
+    states_puzzles = []
+    frontier_puzzles = [frontier[0].state.puzzle]
+
+
+    while len(frontier) > 0:
+        current = frontier.pop()
+        frontier_puzzles.pop()
+        
+        states_searched.append(current)
+        states_puzzles.append(current.state.puzzle)
+
+        if current.state.check_puzzle():
+            final_solution = current.moves
+            # print(current.state.print_puzzle())
+            # print("Depth level", current.depth)
+            return states_searched, final_solution
+        elif current.depth > 17:
+            continue
+
+        newNodes = check_neighbors(current)
+        for i in reversed(newNodes):
+            if i.state.puzzle not in frontier_puzzles and i.state.puzzle not in states_puzzles:
+                frontier.append(i)
+                frontier_puzzles.append(i)
 
 
     return states_searched, final_solution
@@ -130,6 +156,41 @@ def A_Star_H1(puzzle):
     final_solution = []
 
     # TODO: WRITE CODE
+    def heuristic_a1(puzzle):
+        count = 1
+        wrong = 0
+        for i in range(puzzle.state.size):
+            for j in range(puzzle.state.size):
+                if puzzle.state.puzzle[i][j] != count:
+                    wrong += 1
+                count +=1 
+        return wrong
+
+    frontier = [states_searched[0]]
+    frontier_puzzles = [frontier[0].state.puzzle]
+    explored_puzzles = []
+
+    while len(frontier) > 0:
+        current = frontier.pop(0)
+        frontier_puzzles.pop(0)
+        states_searched.append(current)
+        explored_puzzles.append(current.state.puzzle)
+        
+        if current.state.check_puzzle():
+            final_solution = current.moves
+            # print(current.state.print_puzzle())
+            # print("Depth level", current.depth)
+            return states_searched, final_solution
+        
+        newNodes = check_neighbors(current)
+        for i in newNodes:
+            if i.state.puzzle not in frontier_puzzles and i.state.puzzle not in explored_puzzles:
+                frontier.append(i)
+                frontier_puzzles.append(i.state.puzzle)
+        
+        frontier.sort(key=lambda x: x.depth+heuristic_a1(x))
+
+
 
     return states_searched, final_solution
 
