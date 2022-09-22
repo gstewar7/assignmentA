@@ -187,8 +187,8 @@ def A_Star_H1(puzzle):
             if i.state.puzzle not in frontier_puzzles and i.state.puzzle not in explored_puzzles:
                 frontier.append(i)
                 frontier_puzzles.append(i.state.puzzle)
-        
-        frontier.sort(key=lambda x: x.depth+heuristic_a1(x))
+        print("a")
+        frontier.sort(key=lambda x: x.depth + heuristic_a1(x))
 
 
 
@@ -211,5 +211,56 @@ def A_Star_H2(puzzle):
     final_solution = []
 
     # TODO: WRITE CODE
+    # def solution(size):
+    #     puzzle = [[(j*size)+i+1 for i in range(size)] for j in range(size)]
+    #     puzzle[size-1][size-1] = 0
+    solution = NPuzzle(puzzle.size)
+
+    def heuristic_a2(puzzle, solution):
+        def index_2d(lis, v):
+            for i, x in enumerate(lis):
+                if v in x:
+                    return i, x.index(v)
+        
+        totalsum = 0
+        count = 1
+        size = solution.size
+        for i in range(size):
+            for j in range(size):
+                if count == size*size:
+                    count = 0
+                a, b = index_2d(solution.puzzle, count)
+                c, d = index_2d(puzzle, count)
+                result = abs(a-c) + abs(b-d)
+                count += 1
+                totalsum += result
+        return totalsum
+
+    #heur = heuristic_a2(puzzle.puzzle, solution)
+    ##################################################
+    ##################################################
+    frontier = [states_searched[0]]
+    frontier_puzzles = [frontier[0].state.puzzle]
+    explored_puzzles = []
+
+    while len(frontier) > 0:
+        current = frontier.pop(0)
+        frontier_puzzles.pop(0)
+        states_searched.append(current)
+        explored_puzzles.append(current.state.puzzle)
+        
+        if current.state.check_puzzle():
+            final_solution = current.moves
+            # print(current.state.print_puzzle())
+            # print("Depth level", current.depth)
+            return states_searched, final_solution
+        
+        newNodes = check_neighbors(current)
+        for i in newNodes:
+            if i.state.puzzle not in frontier_puzzles and i.state.puzzle not in explored_puzzles:
+                frontier.append(i)
+                frontier_puzzles.append(i.state.puzzle)
+        
+        frontier.sort(key=lambda x: x.depth+heuristic_a2(x.state.puzzle, solution))
 
     return states_searched, final_solution

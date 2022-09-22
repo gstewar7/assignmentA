@@ -1,6 +1,6 @@
 from helpers import NPuzzle, Node, UP, DOWN, LEFT, RIGHT
 from search import BFS, DFS, A_Star_H1, A_Star_H2
-
+from time import perf_counter
 
 def get_move_string(moves):
     """
@@ -35,24 +35,33 @@ def run_test(size, filename):
     puzzle = NPuzzle(size)
     print(f"{filename}:")
 
-    puzzle.read_puzzle(filename)
-    states, moves = BFS(puzzle)
-    if not states[-1].state.check_puzzle():
-        print("    BFS | FAIL")
-        print("          SOL MOVES: " + get_move_string(moves))
-    else:
-        print("    BFS | PASS")
-        print("          SOL MOVES: " + get_move_string (moves))
+    # t1_start = perf_counter()
+    # puzzle.read_puzzle(filename)
+    # states, moves = BFS(puzzle)
+    # if not states[-1].state.check_puzzle():
+    #     print("    BFS | FAIL")
+    #     print("          SOL MOVES: " + get_move_string(moves))
+    # else:
+    #     print("    BFS | PASS")
+    #     print("          SOL MOVES: " + get_move_string (moves))
+    # t1_stop = perf_counter()
+    # test = t1_stop - t1_start
+    # print("    Time taken: %.2f seconds" % test)
 
-    puzzle.read_puzzle(filename)
-    states, moves = DFS(puzzle)
-    if not states[-1].state.check_puzzle():
-        print("    DFS | FAIL")
-        print("          SOL MOVES: " + get_move_string(moves))
-    else:
-        print("    DFS | PASS")
-        print("          SOL MOVES: " + get_move_string(moves))
+    # t1_start = perf_counter()
+    # puzzle.read_puzzle(filename)
+    # states, moves = DFS(puzzle)
+    # if not states[-1].state.check_puzzle():
+    #     print("    DFS | FAIL")
+    #     print("          SOL MOVES: " + get_move_string(moves))
+    # else:
+    #     print("    DFS | PASS")
+    #     print("          SOL MOVES: " + get_move_string(moves))
+    # t1_stop = perf_counter()
+    # test = t1_stop - t1_start
+    # print("    Time taken: %.2f seconds" % test)
 
+    t1_start = perf_counter()
     puzzle.read_puzzle(filename)
     states, moves = A_Star_H1(puzzle)
     if not states[-1].state.check_puzzle():
@@ -61,7 +70,11 @@ def run_test(size, filename):
     else:
         print("    A*1 | PASS")
         print("          SOL MOVES: " + get_move_string(moves))
+    t1_stop = perf_counter()
+    test = t1_stop - t1_start
+    print("    Time taken: %.2f seconds" % test)
 
+    t1_start = perf_counter()
     puzzle.read_puzzle(filename)
     states, moves = A_Star_H2(puzzle)
     if not states[-1].state.check_puzzle():
@@ -70,6 +83,9 @@ def run_test(size, filename):
     else:
         print("    A*2 | PASS")
         print("          SOL MOVES: " + get_move_string(moves))
+    t1_stop = perf_counter()
+    test = t1_stop - t1_start
+    print("    Time taken: %.2f seconds" % test)
     print("-" * 20)
 
 
