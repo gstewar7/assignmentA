@@ -1,6 +1,7 @@
 from helpers import NPuzzle, Node, UP, DOWN, LEFT, RIGHT
 from search import BFS, DFS, A_Star_H1, A_Star_H2
 from time import perf_counter
+import tracemalloc
 
 def get_move_string(moves):
     """
@@ -35,32 +36,39 @@ def run_test(size, filename):
     puzzle = NPuzzle(size)
     print(f"{filename}:")
 
-    # t1_start = perf_counter()
-    # puzzle.read_puzzle(filename)
-    # states, moves = BFS(puzzle)
-    # if not states[-1].state.check_puzzle():
-    #     print("    BFS | FAIL")
-    #     print("          SOL MOVES: " + get_move_string(moves))
-    # else:
-    #     print("    BFS | PASS")
-    #     print("          SOL MOVES: " + get_move_string (moves))
-    # t1_stop = perf_counter()
-    # test = t1_stop - t1_start
-    # print("    Time taken: %.2f seconds" % test)
+    tracemalloc.start()
+    t1_start = perf_counter()
+    puzzle.read_puzzle(filename)
+    states, moves = BFS(puzzle)
+    if not states[-1].state.check_puzzle():
+        print("    BFS | FAIL")
+        print("          SOL MOVES: " + get_move_string(moves))
+    else:
+        print("    BFS | PASS")
+        print("          SOL MOVES: " + get_move_string (moves))
+    t1_stop = perf_counter()
+    test = t1_stop - t1_start
+    print("    Time taken: %.2f seconds" % test)
+    print("    Memory Usage:",tracemalloc.get_traced_memory()[1])
+    tracemalloc.stop()
 
-    # t1_start = perf_counter()
-    # puzzle.read_puzzle(filename)
-    # states, moves = DFS(puzzle)
-    # if not states[-1].state.check_puzzle():
-    #     print("    DFS | FAIL")
-    #     print("          SOL MOVES: " + get_move_string(moves))
-    # else:
-    #     print("    DFS | PASS")
-    #     print("          SOL MOVES: " + get_move_string(moves))
-    # t1_stop = perf_counter()
-    # test = t1_stop - t1_start
-    # print("    Time taken: %.2f seconds" % test)
+    tracemalloc.start()
+    t1_start = perf_counter()
+    puzzle.read_puzzle(filename)
+    states, moves = DFS(puzzle)
+    if not states[-1].state.check_puzzle():
+        print("    DFS | FAIL")
+        print("          SOL MOVES: " + get_move_string(moves))
+    else:
+        print("    DFS | PASS")
+        print("          SOL MOVES: " + get_move_string(moves))
+    t1_stop = perf_counter()
+    test = t1_stop - t1_start
+    print("    Time taken: %.2f seconds" % test)
+    print("    Memory Usage:",tracemalloc.get_traced_memory()[1])
+    tracemalloc.stop()
 
+    tracemalloc.start()
     t1_start = perf_counter()
     puzzle.read_puzzle(filename)
     states, moves = A_Star_H1(puzzle)
@@ -73,7 +81,10 @@ def run_test(size, filename):
     t1_stop = perf_counter()
     test = t1_stop - t1_start
     print("    Time taken: %.2f seconds" % test)
+    print("    Memory Usage:",tracemalloc.get_traced_memory()[1])
+    tracemalloc.stop()
 
+    tracemalloc.start()
     t1_start = perf_counter()
     puzzle.read_puzzle(filename)
     states, moves = A_Star_H2(puzzle)
@@ -86,6 +97,8 @@ def run_test(size, filename):
     t1_stop = perf_counter()
     test = t1_stop - t1_start
     print("    Time taken: %.2f seconds" % test)
+    print("    Memory Usage:",tracemalloc.get_traced_memory()[1])
+    tracemalloc.stop()
     print("-" * 20)
 
 
@@ -93,5 +106,5 @@ run_test(3, 'C:/School/AI/AssignmentA/test_data/ex1.txt')
 run_test(3, 'C:/School/AI/AssignmentA/test_data/ex2.txt')
 run_test(3, 'C:/School/AI/AssignmentA/test_data/ex3.txt')
 run_test(3, 'C:/School/AI/AssignmentA/test_data/ex4.txt')
-run_test(4, 'C:/School/AI/AssignmentA/test_data/ex5.txt')
-run_test(4, 'C:/School/AI/AssignmentA/test_data/ex6.txt') 
+# run_test(4, 'C:/School/AI/AssignmentA/test_data/ex5.txt')
+# run_test(4, 'C:/School/AI/AssignmentA/test_data/ex6.txt') 

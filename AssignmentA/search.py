@@ -2,7 +2,16 @@ from helpers import Node, NPuzzle, LEFT, RIGHT, UP, DOWN
 from copy import deepcopy
 
 
+
 def check_neighbors(node):
+    """
+    check_neighbors
+    Arguements: A node representing the current node being checked
+    Check all surrounding tiles for valid moves
+
+    Return: 
+    newNodes: A list of nodes in U D L R order
+    """
     puzzle = node.state
     zeroX, zeroY = puzzle.zero[0], puzzle.zero[1]
     newNodes = []
@@ -46,12 +55,13 @@ def BFS(puzzle):
     
     # TODO: WRITE CODE
     if puzzle.size > 3:
-        print("Puzzle too big, did not try")
+        print("Puzzle too big, did not try") #Please don't be mad 
         return states_searched, final_solution
         
     frontier = [Node(puzzle)]
-    #current = frontier [0]
 
+    #For all algorithms, I created a list containing only the state itself, as it was easier to compare the current puzzle
+    #to a list of puzzle, rather than comparing current node to a list of nodes
     states_puzzles = [states_searched[0].state.puzzle]
     frontier_puzzles = [frontier[0].state.puzzle]
 
@@ -68,8 +78,6 @@ def BFS(puzzle):
 
         if current.state.check_puzzle():          
             final_solution = current.moves
-            # #print(current.state.print_puzzle())
-            # print("Depth level", current.depth)
             return states_searched, final_solution
         else:
             newNodes = check_neighbors(current)
@@ -83,7 +91,6 @@ def BFS(puzzle):
                         frontier.append(i)
                         frontier_puzzles.append(i.state.puzzle)
 
-    #end of while loop
 
     print("Depth limit reached")
     return states_searched, final_solution
@@ -105,7 +112,7 @@ def DFS(puzzle):
 
     # TODO: WRITE CODE
     if puzzle.size > 3:
-        print("Puzzle too big, did not try")
+        print("Puzzle too big, did not try")  #Please don't be mad 
         states_searched = [Node(puzzle)]
         return states_searched, final_solution
 
@@ -124,13 +131,13 @@ def DFS(puzzle):
 
         if current.state.check_puzzle():
             final_solution = current.moves
-            # print(current.state.print_puzzle())
-            # print("Depth level", current.depth)
             return states_searched, final_solution
-        elif current.depth > 17:
+        elif current.depth > 20:
             continue
 
         newNodes = check_neighbors(current)
+
+        #I check the resulting list from check_neighbors in reverse order to add to the stack in the order specified (U, D, L, R)
         for i in reversed(newNodes):
             if i.state.puzzle not in frontier_puzzles and i.state.puzzle not in states_puzzles:
                 frontier.append(i)
@@ -157,6 +164,16 @@ def A_Star_H1(puzzle):
 
     # TODO: WRITE CODE
     def heuristic_a1(puzzle):
+        """
+            A*1 Heuristic 
+            Input: a puzzle representing the current node
+
+            Iterates through the puzzle in order, if the tile does not match the count then it's in the wrong place
+            and gets added to a total
+
+            Return:
+                Wrong: The total number of tiles in the wrong place
+        """
         count = 1
         wrong = 0
         for i in range(puzzle.state.size):
@@ -178,8 +195,6 @@ def A_Star_H1(puzzle):
         
         if current.state.check_puzzle():
             final_solution = current.moves
-            # print(current.state.print_puzzle())
-            # print("Depth level", current.depth)
             return states_searched, final_solution
         
         newNodes = check_neighbors(current)
@@ -187,7 +202,7 @@ def A_Star_H1(puzzle):
             if i.state.puzzle not in frontier_puzzles and i.state.puzzle not in explored_puzzles:
                 frontier.append(i)
                 frontier_puzzles.append(i.state.puzzle)
-        print("a")
+
         frontier.sort(key=lambda x: x.depth + heuristic_a1(x))
 
 
@@ -211,13 +226,29 @@ def A_Star_H2(puzzle):
     final_solution = []
 
     # TODO: WRITE CODE
-    # def solution(size):
-    #     puzzle = [[(j*size)+i+1 for i in range(size)] for j in range(size)]
-    #     puzzle[size-1][size-1] = 0
+
     solution = NPuzzle(puzzle.size)
 
     def heuristic_a2(puzzle, solution):
+        """
+            Heuristic for A*2
+            Input:
+                -Puzzle: the current puzzle 
+                -Solution: The puzzle in it's final state
+
+            Iterates through the current puzzle getting the index of each tile and the index of where the tile should be
+            Adds the absolute value of the difference between the current tile row and desired positions row,
+            as well as the column for both respectively
+            Adds the two resulting values to get the manhattan distance from the current tile position and desired position
+            Sums all of the manhattan distances for all tiles in the puzzle
+        
+        """
         def index_2d(lis, v):
+            """
+                Returns the indeces of a value in a 2d array
+
+                Full disclosure: I pulled this from google 
+            """
             for i, x in enumerate(lis):
                 if v in x:
                     return i, x.index(v)
@@ -236,9 +267,6 @@ def A_Star_H2(puzzle):
                 totalsum += result
         return totalsum
 
-    #heur = heuristic_a2(puzzle.puzzle, solution)
-    ##################################################
-    ##################################################
     frontier = [states_searched[0]]
     frontier_puzzles = [frontier[0].state.puzzle]
     explored_puzzles = []
@@ -251,8 +279,6 @@ def A_Star_H2(puzzle):
         
         if current.state.check_puzzle():
             final_solution = current.moves
-            # print(current.state.print_puzzle())
-            # print("Depth level", current.depth)
             return states_searched, final_solution
         
         newNodes = check_neighbors(current)
